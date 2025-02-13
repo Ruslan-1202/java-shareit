@@ -15,10 +15,10 @@ import ru.practicum.shareit.user.User;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemDto {
-    private Long id; // — уникальный идентификатор вещи;
+//    private Long id; // — уникальный идентификатор вещи;
     private String name; // — краткое название;
     private String description; // — развёрнутое описание;
-    private Short available; // — статус о том, доступна или нет вещь для аренды;
-    private User owner; // — владелец вещи;
-    private ItemRequest request;
+    private boolean available; // — статус о том, доступна или нет вещь для аренды;
+//    private User owner; // — владелец вещи;
+    private Long request;
 }
