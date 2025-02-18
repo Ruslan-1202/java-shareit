@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import ru.practicum.shareit.request.ItemRequest;
 
 /**
  * TODO Sprint add-controllers.
@@ -13,10 +14,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemDto {
-//    private Long id; // — уникальный идентификатор вещи;
+    private Long id; // — уникальный идентификатор вещи;
     private String name; // — краткое название;
     private String description; // — развёрнутое описание;
     private boolean available; // — статус о том, доступна или нет вещь для аренды;
 //    private User owner; // — владелец вещи;
-    private Long request;
+//    private ItemRequest request;
 }
