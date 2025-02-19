@@ -30,7 +30,8 @@ public class ItemService {
     }
 
     public ItemDto get(Long userId, Long itemId) {
-        return ItemMapper.toItemDto(checkUserGetItem(userId, itemId));
+        getUser(userId); //проверим, что пользак есть
+        return ItemMapper.toItemDto(getItem(itemId));
     }
 
     public ItemDto change(Long userId, ItemPatchDto itemDto) {
@@ -38,17 +39,6 @@ public class ItemService {
         item = toItemFromItemPatchDto(item, itemDto);
         itemStorage.save(item);
         return ItemMapper.toItemDto(item);
-    }
-
-    private Item checkUserGetItem(Long userId, Long itemId) {
-        User user = userStorage.get(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
-        Item item = itemStorage.get(itemId)
-                .orElseThrow(() -> new NotFoundException("Вещь не найдена"));
-        if (!user.equals(item.getOwner())) {
-            throw new WrongUserException("Пользователи не совпадают");
-        }
-        return item;
     }
 
     public List<ItemDto> getByUser(Long userId) {
@@ -61,5 +51,27 @@ public class ItemService {
         return itemStorage.search(userId, text).stream()
                 .map(item -> toItemDto(item))
                 .toList();
+    }
+
+
+    private Item checkUserGetItem(Long userId, Long itemId) {
+        User user = getUser(userId);
+        Item item = getItem(itemId);
+        if (!user.equals(item.getOwner())) {
+            throw new WrongUserException("Пользователи не совпадают");
+        }
+        return item;
+    }
+
+    private Item getItem(Long itemId) {
+        Item item = itemStorage.get(itemId)
+                .orElseThrow(() -> new NotFoundException("Вещь не найдена"));
+        return item;
+    }
+
+    private User getUser(Long userId) {
+        User user = userStorage.get(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        return user;
     }
 }

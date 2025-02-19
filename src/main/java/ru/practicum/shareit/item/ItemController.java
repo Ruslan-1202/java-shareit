@@ -20,23 +20,27 @@ public class ItemController {
     @PostMapping
     public ItemDto createItem(@RequestHeader(USER_HEADER) Long userId,
                               @Valid @RequestBody ItemDto item) {
+        log.debug("Создание вещи");
         return itemService.create(userId, item);
     }
 
     @GetMapping("{itemId}")
     public ItemDto getItem(@RequestHeader(USER_HEADER) Long userId,
                            @PathVariable("itemId") Long itemId) {
+        log.debug("Получение вещи");
         return itemService.get(userId, itemId);
     }
 
     @GetMapping()
     public List<ItemDto> getItemsByUser(@RequestHeader(USER_HEADER) Long userId) {
+        log.debug("Получение вещей пользователя");
         return itemService.getByUser(userId);
     }
 
     @GetMapping("/search")
     public List<ItemDto> searchItem(@RequestHeader(USER_HEADER) Long userId,
                                     @RequestParam("text") String text) {
+        log.debug("Поиск вещи");
         return itemService.searchItem(userId, text);
     }
 
@@ -44,6 +48,7 @@ public class ItemController {
     public ItemDto patchItem(@RequestHeader(USER_HEADER) Long userId,
                              @PathVariable("itemId") Long itemId,
                              @RequestBody ItemPatchDto item) {
+        log.debug("Изменение вещи");
         item.setId(itemId);
         return itemService.change(userId, item);
     }
