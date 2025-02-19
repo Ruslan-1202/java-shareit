@@ -8,15 +8,14 @@ import java.util.Optional;
 
 @Component
 public class ItemStorageInMemory implements ItemStorage {
-    private HashMap<Long, Item> items = new HashMap<>();
+    private final HashMap<Long, Item> items = new HashMap<>();
     private Long counter = 0L;
 
     @Override
     public Optional<Item> create(Item item) {
-        checks(item);
         items.put(++counter, item);
         item.setId(counter);
-        return Optional.ofNullable(item);
+        return Optional.of(item);
     }
 
     @Override
@@ -27,13 +26,23 @@ public class ItemStorageInMemory implements ItemStorage {
     @Override
     public List<Item> getByUser(Long userId) {
         return items.values().stream()
-                .filter(a->a.getOwner().getId().equals(userId))
+                .filter(a -> a.getOwner().getId().equals(userId))
                 .toList();
     }
 
-    private void checks(Item item) {
-        if (item.isAvailable() ) {
+    @Override
+    public void save(Item item) {
+        items.put(item.getId(), item);
+    }
 
+    @Override
+    public List<Item> search(Long userId, String text) {
+        if (text.isEmpty()) {
+            return List.of();
         }
+        return items.values().stream()
+                .filter(a -> a.getName().toUpperCase().contains(text) || a.getDescription().toUpperCase().contains(text))
+                .filter(a -> a.isAvailable())
+                .toList();
     }
 }

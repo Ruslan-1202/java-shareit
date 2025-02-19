@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Component
 public class UserStorageInMemory implements UserStorage {
-    private HashMap<Long, User> users = new HashMap<>();
+    private final HashMap<Long, User> users = new HashMap<>();
     private Long counter = 0L;
 
     @Override
@@ -17,7 +17,7 @@ public class UserStorageInMemory implements UserStorage {
         checkMail(user);
         user.setId(++counter);
         users.put(user.getId(), user);
-        return Optional.ofNullable(user);
+        return Optional.of(user);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class UserStorageInMemory implements UserStorage {
                 .filter(u -> u.getEmail().equals(newUser.getEmail()) && !u.getId().equals(newUser.getId()))
                 .findFirst()
                 .isPresent()) {
-            throw new ExsistingEmailException("Email already exists");
+            throw new ExsistingEmailException("Такая почта уже есть");
         }
     }
 }

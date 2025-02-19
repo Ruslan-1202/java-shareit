@@ -5,9 +5,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Data
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
