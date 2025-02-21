@@ -19,12 +19,12 @@ public class UserService {
 
     public UserDto get(Long id) {
         return UserMapper.toUserDto(userStorage.get(id)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден")));
+                .orElseThrow(() -> new NotFoundException("Пользователь id=" + id + " не найден")));
     }
 
     public UserDto save(Long id, UserDto userDto) {
         User user = userStorage.get(id)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+                .orElseThrow(() -> new NotFoundException("Пользователь id=" + id + " не найден"));
         if (userDto.getEmail() != null) {
             user.setEmail(userDto.getEmail());
         }

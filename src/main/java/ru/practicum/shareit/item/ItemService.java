@@ -23,15 +23,20 @@ public class ItemService {
 
     public ItemDto create(Long userId, ItemDto itemDto) {
         User user = userStorage.get(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+                .orElseThrow(() -> new NotFoundException("Пользователь id=" + userId + " не найден"));
         Item item = itemStorage.create(ItemMapper.toItem(user, itemDto))
                 .orElseThrow(() -> new StorageException("Не удалось создать вещь"));
         return ItemMapper.toItemDto(item);
     }
 
     public ItemDto get(Long userId, Long itemId) {
-        getUser(userId); //проверим, что пользак есть
+        checkUserExists(userId);
         return ItemMapper.toItemDto(getItem(itemId));
+    }
+
+    private void checkUserExists(Long userId) {
+        userStorage.get(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь id=" + userId + " не найден"));
     }
 
     public ItemDto change(Long userId, ItemPatchDto itemDto) {
@@ -65,13 +70,13 @@ public class ItemService {
 
     private Item getItem(Long itemId) {
         Item item = itemStorage.get(itemId)
-                .orElseThrow(() -> new NotFoundException("Вещь не найдена"));
+                .orElseThrow(() -> new NotFoundException("Вещь id=" + itemId + " не найдена"));
         return item;
     }
 
     private User getUser(Long userId) {
         User user = userStorage.get(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+                .orElseThrow(() -> new NotFoundException("Пользователь id=" + userId + " не найден"));
         return user;
     }
 }
