@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class ItemStorageInMemory implements ItemStorage {
+public class ItemStorageImpl implements ItemStorage {
     private final HashMap<Long, Item> items = new HashMap<>();
     private Long counter = 0L;
 
