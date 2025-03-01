@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.StorageException;
+import ru.practicum.shareit.user.dto.UserCreateDto;
 import ru.practicum.shareit.user.dto.UserDto;
 
 @Service
@@ -11,8 +12,8 @@ import ru.practicum.shareit.user.dto.UserDto;
 public class UserService {
     private final UserStorage userStorage;
 
-    public UserDto create(UserDto userDto) {
-        User user = userStorage.create(UserMapper.toUser(userDto))
+    public UserDto create(UserCreateDto userCreateDto) {
+        User user = userStorage.create(UserMapper.toUser(userCreateDto))
                 .orElseThrow(() -> new StorageException("Не удалось создать юзера"));
         return UserMapper.toUserDto(user);
     }
