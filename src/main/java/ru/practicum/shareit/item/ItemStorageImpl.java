@@ -1,38 +1,33 @@
 package ru.practicum.shareit.item;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
 @Component
+@RequiredArgsConstructor
 public class ItemStorageImpl implements ItemStorage {
-    private final HashMap<Long, Item> items = new HashMap<>();
-    private Long counter = 0L;
+    private final ItemRepository itemRepository;
 
     @Override
     public Optional<Item> create(Item item) {
-        items.put(++counter, item);
-        item.setId(counter);
-        return Optional.of(item);
+        return Optional.of(itemRepository.save(item));
     }
 
     @Override
     public Optional<Item> get(Long itemId) {
-        return Optional.ofNullable(items.get(itemId));
+        return itemRepository.findById(itemId);
     }
 
     @Override
     public List<Item> getByUser(Long userId) {
-        return items.values().stream()
-                .filter(a -> a.getOwner().getId().equals(userId))
-                .toList();
+        return itemRepository.findByUserId(userId);
     }
 
     @Override
     public void save(Item item) {
-        items.put(item.getId(), item);
+        itemRepository.save(item);
     }
 
     @Override
@@ -40,9 +35,6 @@ public class ItemStorageImpl implements ItemStorage {
         if (text.isEmpty()) {
             return List.of();
         }
-        return items.values().stream()
-                .filter(a -> a.getName().toUpperCase().contains(text) || a.getDescription().toUpperCase().contains(text))
-                .filter(a -> a.isAvailable())
-                .toList();
+        return itemRepository.search(text);
     }
 }
