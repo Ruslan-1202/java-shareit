@@ -13,7 +13,6 @@ import java.util.List;
 @RequestMapping("/items")
 @Slf4j
 @RequiredArgsConstructor
-//@Validated
 public class ItemController {
     private static final String USER_HEADER = "X-Sharer-User-Id";
     private final ItemService itemService;

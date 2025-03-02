@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import java.util.List;
@@ -11,6 +12,7 @@ public class ItemStorageImpl implements ItemStorage {
     private final ItemRepository itemRepository;
 
     @Override
+    @Transactional
     public Optional<Item> create(Item item) {
         return Optional.of(itemRepository.save(item));
     }
@@ -26,6 +28,7 @@ public class ItemStorageImpl implements ItemStorage {
     }
 
     @Override
+    @Transactional
     public void save(Item item) {
         itemRepository.save(item);
     }
