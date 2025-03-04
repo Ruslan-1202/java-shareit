@@ -3,7 +3,6 @@ package ru.practicum.shareit.user;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.exception.StorageException;
 
 import java.util.Optional;
 
@@ -15,7 +14,7 @@ public class UserStorageImpl implements UserStorage {
     @Override
     @Transactional
     public Optional<User> create(User user) {
-        return Optional.ofNullable(userRepository.save(user));
+        return Optional.of(userRepository.save(user));
     }
 
     @Override

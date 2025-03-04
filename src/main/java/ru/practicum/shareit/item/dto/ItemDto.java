@@ -19,6 +19,4 @@ public class ItemDto {
     private String description; // — развёрнутое описание;
     @NotNull
     private Boolean available; // — статус о том, доступна или нет вещь для аренды;
-//    private User owner; // — владелец вещи;
-//    private ItemRequest request;
 }

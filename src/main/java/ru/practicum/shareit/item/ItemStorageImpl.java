@@ -3,6 +3,9 @@ package ru.practicum.shareit.item;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import ru.practicum.shareit.comment.Comment;
+import ru.practicum.shareit.comment.CommentRepository;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +13,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ItemStorageImpl implements ItemStorage {
     private final ItemRepository itemRepository;
+    private final CommentRepository commentRepository;
 
     @Override
     @Transactional
@@ -39,5 +43,15 @@ public class ItemStorageImpl implements ItemStorage {
             return List.of();
         }
         return itemRepository.search(text);
+    }
+
+    @Override
+    public Optional<Comment> saveComment(Comment comment) {
+        return Optional.of(commentRepository.save(comment));
+    }
+
+    @Override
+    public List<Comment> getCommentsByItem(Long itemId) {
+        return commentRepository.findByItem_Id(itemId);
     }
 }

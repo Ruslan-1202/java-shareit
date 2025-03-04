@@ -36,7 +36,7 @@ public class ItemMapper {
                 oldItem.getDescription(),
                 oldItem.isAvailable(),
                 oldItem.getOwner(),
-                oldItem.getRequest()
+                oldItem.getRequest_id()
         );
 
         if (itemPatchDto.getName() != null) {

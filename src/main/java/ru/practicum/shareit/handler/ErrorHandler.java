@@ -7,10 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.practicum.shareit.exception.ExsistingEmailException;
-import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.StorageException;
-import ru.practicum.shareit.exception.WrongUserException;
+import ru.practicum.shareit.exception.*;
 
 import java.util.stream.Collectors;
 
@@ -58,6 +55,20 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse dataIntegrityViolationException(final DataIntegrityViolationException e) {
+        log.error(e.getMessage(), e);
+        return new ErrorResponse("Нарушение целостности БД, осторожнее с данными!");
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse notAvilableException(final NotAvilableException e) {
+        log.error(e.getMessage(), e);
+        return new ErrorResponse("Нарушение целостности БД, осторожнее с данными!");
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse wrongDatesException(final WrongDatesException e) {
         log.error(e.getMessage(), e);
         return new ErrorResponse("Нарушение целостности БД, осторожнее с данными!");
     }

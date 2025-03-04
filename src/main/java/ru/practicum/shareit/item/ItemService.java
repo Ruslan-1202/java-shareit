@@ -2,6 +2,10 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.comment.Comment;
+import ru.practicum.shareit.comment.CommentMapper;
+import ru.practicum.shareit.comment.dto.CommentCreateDto;
+import ru.practicum.shareit.comment.dto.CommentRetDto;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.StorageException;
 import ru.practicum.shareit.exception.WrongUserException;
@@ -69,14 +73,29 @@ public class ItemService {
     }
 
     private Item getItem(Long itemId) {
-        Item item = itemStorage.get(itemId)
+        return itemStorage.get(itemId)
                 .orElseThrow(() -> new NotFoundException("Вещь id=" + itemId + " не найдена"));
-        return item;
     }
 
     private User getUser(Long userId) {
-        User user = userStorage.get(userId)
+        return userStorage.get(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь id=" + userId + " не найден"));
-        return user;
+    }
+
+    public CommentRetDto createComment(Long userId, Long itemId, CommentCreateDto commentCreateDto) {
+        User user = getUser(userId);
+        Item item = getItem(itemId);
+
+        Comment comment = new CommentMapper().toComment(commentCreateDto, user, item);
+
+        return new CommentMapper().toCommentRetDto(itemStorage.saveComment(comment)
+                .orElseThrow(()->new StorageException("Не удалось сохранить комментарий")));
+    }
+
+    public List<CommentRetDto> getCommentsByItem(Long userId, Long itemId) {
+        checkUserGetItem(userId, itemId);
+        return itemStorage.getCommentsByItem(itemId).stream()
+                .map(comment -> new CommentMapper().toCommentRetDto(comment))
+                .toList();
     }
 }
