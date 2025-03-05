@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.enumeration.BookingState;
 import ru.practicum.shareit.booking.enumeration.BookingStatus;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,8 +27,10 @@ public class BookingStorageImpl implements BookingStorage {
 
     @Override
     @Transactional
-    public long approve(long bookingId, int status) {
-        return bookingRepository.setStatus(bookingId, status);
+    public Booking approve(Booking booking, BookingStatus bookingStatus) {
+        booking.setStatus(bookingStatus);
+        bookingRepository.save(booking);
+        return booking;
     }
 
     @Override

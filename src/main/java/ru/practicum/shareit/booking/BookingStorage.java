@@ -12,7 +12,7 @@ public interface BookingStorage {
 
     Optional<Booking> get(long bookingId);
 
-    long approve(long bookingId, int status);
+    Booking approve(Booking booking, BookingStatus bookingStatus);
 
     List<Booking> getAll(long userId, BookingState bookingState);
 }

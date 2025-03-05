@@ -46,7 +46,7 @@ public class BookingController {
     @GetMapping()
     public List<BookingDto> getAll(@RequestHeader(USER_HEADER) long userId,
                                    @RequestParam(defaultValue = "ALL") String state) {
-        log.debug("getAll id={}, state={}", userId, state);
+        log.debug("getAll userId={}, state={}", userId, state);
         return bookingService.getAll(userId, state);
     }
 }

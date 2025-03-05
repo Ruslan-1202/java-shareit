@@ -43,17 +43,14 @@ public class BookingService {
 
         checkUser(userId);
 
-        int status;
         BookingStatus bookingStatus;
         if (approved) {
             bookingStatus = BookingStatus.APPROVED;
-            status = bookingStatus.ordinal();
         } else {
             bookingStatus = BookingStatus.REJECTED;
-            status = bookingStatus.ordinal();
         }
-        bookingStorage.approve(bookingId, status);
-        booking.setStatus(bookingStatus);
+
+        bookingStorage.approve(booking, bookingStatus);
         return new BookingMapper().toBookingDto(booking);
     }
 

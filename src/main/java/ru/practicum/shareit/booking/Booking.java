@@ -1,10 +1,7 @@
 package ru.practicum.shareit.booking;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.practicum.shareit.booking.enumeration.BookingStatus;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.user.User;
@@ -13,8 +10,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "bookings", schema = "public")
-@Data
-@EqualsAndHashCode(of = "id")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Booking {
