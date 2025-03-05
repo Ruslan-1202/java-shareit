@@ -17,6 +17,13 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse wrongBookingStateException(final WrongBookingStateException e) {
+        log.error(e.getMessage(), e);
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse storageError(final StorageException e) {
         log.error(e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
