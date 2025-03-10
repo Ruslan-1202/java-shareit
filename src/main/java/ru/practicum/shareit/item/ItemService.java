@@ -3,7 +3,9 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingStorage;
+import ru.practicum.shareit.booking.dto.BookingInfoDto;
 import ru.practicum.shareit.comment.Comment;
 import ru.practicum.shareit.comment.CommentMapper;
 import ru.practicum.shareit.comment.dto.CommentCreateDto;
@@ -40,8 +42,7 @@ public class ItemService {
     public ItemDto get(Long userId, Long itemId) {
         checkUserExists(userId);
         ItemDto itemDto = ItemMapper.toItemDto(getItem(itemId));
-        return addFields(List.of(itemDto)).get(0);
-        // return ItemMapper.toItemDto(getItem(itemId));
+        return addBookingAndComments(List.of(itemDto), userId).getFirst();
     }
 
     private void checkUserExists(Long userId) {
@@ -68,28 +69,30 @@ public class ItemService {
                 .toList();
     }
 
-    private List<ItemDto> addFields(List<ItemDto> items) {
+    private List<ItemDto> addBookingAndComments(List<ItemDto> items, long userId) {
         List<Comment> comments = itemStorage.getComments(items);
         List<Booking> bookings = bookingStorage.getBokings(items);
 
         for (ItemDto item : items) {
-            ItemDto bookingDto = bookings.stream()
+            BookingInfoDto bookingDto = bookings.stream()
+                    .filter(booking -> booking.getItem().getOwner().getId() == userId)
                     .filter(booking -> booking.getItem().getId().equals(item.getId()))
                     .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
                     .max((o1, o2) -> o1.getStart().isBefore(o2.getStart()) ? -1 : 1)
-                    .map(booking -> ItemMapper.toItemDto(booking.getItem()))
+                    .map(booking -> new BookingMapper().toBookingInfoDto(booking))
                     .orElse(null);
 
-            item.setBookingPrev(bookingDto);
+            item.setLastBooking(bookingDto);
 
             bookingDto = bookings.stream()
+                    .filter(booking -> booking.getItem().getOwner().getId() == userId)
                     .filter(booking -> booking.getItem().getId().equals(item.getId()))
                     .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
                     .min((o1, o2) -> o1.getStart().isBefore(o2.getStart()) ? -1 : 1)
-                    .map(booking -> ItemMapper.toItemDto(booking.getItem()))
+                    .map(booking -> new BookingMapper().toBookingInfoDto(booking))
                     .orElse(null);
 
-            item.setBookingNext(bookingDto);
+            item.setNextBooking(bookingDto);
         }
 
         items.stream()
@@ -100,24 +103,6 @@ public class ItemService {
                                         .toList()
                         )
                 )
-//                .peek(item -> item.setBookingPrev(
-//                                bookings.stream()
-//                                        .filter(booking -> booking.getItem().getId().equals(item.getId()))
-//                                        .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
-//                                        .map(booking -> new BookingMapper().toBookingDto(booking))
-//                                        .min((o1, o2) -> o1.getStart().isBefore(o2.getStart()) ? -1 : 1)
-//                                        .orElse(null)
-//                        )
-//                )
-//                .peek(item -> item.setBookingPrev(
-//                                bookings.stream()
-//                                        .filter(booking -> booking.getItem().getId().equals(item.getId()))
-//                                        .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
-//                                        .map(booking -> new BookingMapper().toBookingDto(booking))
-//                                        .max((o1, o2) -> o1.getStart().isBefore(o2.getStart()) ? -1 : 1)
-//                                        .orElse(null)
-//                        )
-//                )
                 .toList();
 
         return items;

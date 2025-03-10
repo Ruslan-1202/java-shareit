@@ -55,8 +55,8 @@ public class BookingService {
         return new BookingMapper().toBookingDto(booking);
     }
 
-    public BookingDto get(long userId, long bookingId) {
-        return new BookingMapper().toBookingDto(checkUserGetBooking(userId, bookingId));
+    public BookingDto get(long bookingId) {
+        return new BookingMapper().toBookingDto(getBooking(bookingId));
     }
 
     public List<BookingDto> getAllByBooker(long userId, String state) {
@@ -108,15 +108,6 @@ public class BookingService {
             throw new NotAvilableException("Вещь id=" + itemId + " недоступна");
         }
         return item;
-    }
-
-    private Booking checkUserGetBooking(long userId, long bookingId) {
-        User user = getUser(userId);
-        Booking booking = getBooking(bookingId);
-//        if (!user.equals(booking.getBooker())) {
-//            throw new WrongUserException("Пользователь id=" + userId + " не владелец вещи id=" + bookingId);
-//        }
-        return booking;
     }
 
     private void checkUser(long userId) {

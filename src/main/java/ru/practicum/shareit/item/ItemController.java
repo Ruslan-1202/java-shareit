@@ -29,7 +29,7 @@ public class ItemController {
     @GetMapping("{itemId}")
     public ItemDto getItem(@RequestHeader(USER_HEADER) Long userId,
                            @PathVariable("itemId") Long itemId) {
-        log.debug("Получение вещи id={}", itemId);
+        log.debug("Получение вещи id={} пользователем={}", itemId, userId);
         return itemService.get(userId, itemId);
     }
 
