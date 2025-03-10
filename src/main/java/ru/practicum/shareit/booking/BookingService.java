@@ -63,7 +63,7 @@ public class BookingService {
         BookingState bookingState = getBookingState(state);
         checkUser(userId);
         return bookingStorage.getAllByUser(userId, bookingState, BookingGetAll.BOOKER).stream()
-                .map(a->new BookingMapper().toBookingDto(a))
+                .map(a -> new BookingMapper().toBookingDto(a))
                 .toList();
     }
 
@@ -71,7 +71,7 @@ public class BookingService {
         BookingState bookingState = getBookingState(state);
         checkUser(userId);
         return bookingStorage.getAllByUser(userId, bookingState, BookingGetAll.OWNER).stream()
-                .map(a->new BookingMapper().toBookingDto(a))
+                .map(a -> new BookingMapper().toBookingDto(a))
                 .toList();
     }
 

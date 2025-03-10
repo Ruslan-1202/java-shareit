@@ -24,5 +24,6 @@ public class Item {
     @ManyToOne(fetch = FetchType.EAGER)
     private User owner; // — владелец вещи;
   //  @ManyToOne//(fetch = FetchType.LAZY)
-    private Long request_id; //— если вещь была создана по запросу другого пользователя, то в этом поле будет храниться ссылка на соответствующий запрос.
+    @Column(name = "request_id")
+    private Long requestId; //— если вещь была создана по запросу другого пользователя, то в этом поле будет храниться ссылка на соответствующий запрос.
 }

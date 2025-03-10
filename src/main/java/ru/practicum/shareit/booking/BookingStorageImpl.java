@@ -9,7 +9,6 @@ import ru.practicum.shareit.booking.enumeration.BookingStatus;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,7 +43,8 @@ public class BookingStorageImpl implements BookingStorage {
         if (BookingState.WAITING.equals(bookingState) || BookingState.REJECTED.equals(bookingState)) {
             BookingStatus bookingStatus = BookingStatus.valueOf(bookingState.name());
             switch (bookingGetAll) {
-                case OWNER -> bookings = bookingRepository.findAllByItem_Owner_IdAndStatusOrderByStartDesc(userId, bookingStatus);
+                case OWNER ->
+                        bookings = bookingRepository.findAllByItem_Owner_IdAndStatusOrderByStartDesc(userId, bookingStatus);
                 default -> bookings = bookingRepository.findAllByBooker_IdAndStatusOrderByStartDesc(
                         userId,
                         bookingStatus

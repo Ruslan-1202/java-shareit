@@ -1,8 +1,6 @@
 package ru.practicum.shareit.item;
 
 import ru.practicum.shareit.comment.Comment;
-import ru.practicum.shareit.comment.dto.CommentGetDto;
-import ru.practicum.shareit.comment.dto.CommentRetDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.util.List;

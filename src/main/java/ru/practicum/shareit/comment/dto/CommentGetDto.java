@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class CommentGetDto {
     private Long id;
     private String text;
-    private Long author_id;
-    private Long item_id;
+    private Long authorId;
+    private Long itemId;
     private LocalDateTime created;
 }

@@ -6,7 +6,6 @@ import ru.practicum.shareit.item.dto.ItemPatchDto;
 import ru.practicum.shareit.user.User;
 
 import java.util.Collections;
-import java.util.List;
 
 public class ItemMapper {
     public static ItemDto toItemDto(Item item) {
@@ -42,7 +41,7 @@ public class ItemMapper {
                 oldItem.getDescription(),
                 oldItem.isAvailable(),
                 oldItem.getOwner(),
-                oldItem.getRequest_id()
+                oldItem.getRequestId()
         );
 
         if (itemPatchDto.getName() != null) {

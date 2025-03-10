@@ -6,7 +6,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.booking.enumeration.BookingStatus;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,11 +14,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query(
             nativeQuery = true,
             value = """
-                   update bookings 
-                      set status = :status 
-                   where id = :bookingId
-                   returning id
-                   """
+                    update bookings
+                       set status = :status
+                    where id = :bookingId
+                    returning id
+                    """
     )
     long setStatus(@Param("bookingId") long bookingId,
                    @Param("status") int status);
@@ -33,7 +32,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             nativeQuery = true,
             value = """
                     select *
-                      from bookings 
+                      from bookings
                      where booker_id = :bookerId
                        and start_date <= :dateTime
                        and end_date  >= :dateTime
@@ -46,7 +45,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             nativeQuery = true,
             value = """
                     select *
-                      from bookings 
+                      from bookings
                      where booker_id = :bookerId
                        and start_date > :dateTime
                     order by start_date desc
@@ -58,7 +57,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             nativeQuery = true,
             value = """
                     select *
-                      from bookings 
+                      from bookings
                      where booker_id = :bookerId
                        and end_date <= :dateTime
                     order by start_date desc
@@ -130,10 +129,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                     select b.*
                       from bookings b
                      where b.item_id in :items
-               --        and end_date = (select max(end_date) 
-               --                          from bookings b1 
-               --                         where b1.item_id = b.item_id
-                 --                         and b1.end_date <= now())
                     order by start_date
                     """
     )

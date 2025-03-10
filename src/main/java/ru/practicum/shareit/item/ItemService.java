@@ -18,7 +18,6 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserStorage;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static ru.practicum.shareit.item.ItemMapper.toItemDto;
@@ -77,14 +76,14 @@ public class ItemService {
         items.stream()
                 .peek(item -> item.setComments(
                                 comments.stream()
-                                        .filter(comment -> comment.getItem().getId() == item.getId())
+                                        .filter(comment -> comment.getItem().getId().equals(item.getId()))
                                         .map(a -> new CommentMapper().toCommentRetDto(a))
                                         .toList()
                         )
                 )
                 .peek(item -> item.setBookingPrev(
                                 bookings.stream()
-                                        .filter(booking -> booking.getItem().getId() == item.getId())
+                                        .filter(booking -> booking.getItem().getId().equals(item.getId()))
                                         .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
                                         .sorted((o1, o2) -> o1.getStart().isBefore(o2.getStart()) ? -1 : 1)
                                         .findFirst()
@@ -94,7 +93,7 @@ public class ItemService {
                 )
                 .peek(item -> item.setBookingPrev(
                                 bookings.stream()
-                                        .filter(booking -> booking.getItem().getId() == item.getId())
+                                        .filter(booking -> booking.getItem().getId().equals(item.getId()))
                                         .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
                                         .sorted((o1, o2) -> o1.getStart().isBefore(o2.getStart()) ? 1 : -1)
                                         .findFirst()
