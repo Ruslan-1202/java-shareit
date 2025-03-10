@@ -113,9 +113,9 @@ public class BookingService {
     private Booking checkUserGetBooking(long userId, long bookingId) {
         User user = getUser(userId);
         Booking booking = getBooking(bookingId);
-        if (!user.equals(booking.getBooker())) {
-            throw new WrongUserException("Пользователь id=" + userId + " не владелец вещи id=" + bookingId);
-        }
+//        if (!user.equals(booking.getBooker())) {
+//            throw new WrongUserException("Пользователь id=" + userId + " не владелец вещи id=" + bookingId);
+//        }
         return booking;
     }
 

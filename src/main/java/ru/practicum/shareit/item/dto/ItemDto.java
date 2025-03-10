@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.comment.dto.CommentRetDto;
 
 import java.util.List;
@@ -24,9 +23,9 @@ public class ItemDto {
     @NotNull
     private Boolean available; // — статус о том, доступна или нет вещь для аренды;
 
-    private BookingDto bookingPrev;
+    private ItemDto bookingPrev;
 
-    private BookingDto bookingNext;
+    private ItemDto bookingNext;
 
     private List<CommentRetDto> comments;
 }

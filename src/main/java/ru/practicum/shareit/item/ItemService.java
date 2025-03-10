@@ -3,7 +3,6 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
-import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingStorage;
 import ru.practicum.shareit.comment.Comment;
 import ru.practicum.shareit.comment.CommentMapper;
@@ -73,6 +72,26 @@ public class ItemService {
         List<Comment> comments = itemStorage.getComments(items);
         List<Booking> bookings = bookingStorage.getBokings(items);
 
+        for (ItemDto item : items) {
+            ItemDto bookingDto = bookings.stream()
+                    .filter(booking -> booking.getItem().getId().equals(item.getId()))
+                    .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
+                    .max((o1, o2) -> o1.getStart().isBefore(o2.getStart()) ? -1 : 1)
+                    .map(booking -> ItemMapper.toItemDto(booking.getItem()))
+                    .orElse(null);
+
+            item.setBookingPrev(bookingDto);
+
+            bookingDto = bookings.stream()
+                    .filter(booking -> booking.getItem().getId().equals(item.getId()))
+                    .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
+                    .min((o1, o2) -> o1.getStart().isBefore(o2.getStart()) ? -1 : 1)
+                    .map(booking -> ItemMapper.toItemDto(booking.getItem()))
+                    .orElse(null);
+
+            item.setBookingNext(bookingDto);
+        }
+
         items.stream()
                 .peek(item -> item.setComments(
                                 comments.stream()
@@ -81,26 +100,24 @@ public class ItemService {
                                         .toList()
                         )
                 )
-                .peek(item -> item.setBookingPrev(
-                                bookings.stream()
-                                        .filter(booking -> booking.getItem().getId().equals(item.getId()))
-                                        .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
-                                        .sorted((o1, o2) -> o1.getStart().isBefore(o2.getStart()) ? -1 : 1)
-                                        .findFirst()
-                                        .map(booking -> new BookingMapper().toBookingDto(booking))
-                                        .orElse(null)
-                        )
-                )
-                .peek(item -> item.setBookingPrev(
-                                bookings.stream()
-                                        .filter(booking -> booking.getItem().getId().equals(item.getId()))
-                                        .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
-                                        .sorted((o1, o2) -> o1.getStart().isBefore(o2.getStart()) ? 1 : -1)
-                                        .findFirst()
-                                        .map(booking -> new BookingMapper().toBookingDto(booking))
-                                        .orElse(null)
-                        )
-                )
+//                .peek(item -> item.setBookingPrev(
+//                                bookings.stream()
+//                                        .filter(booking -> booking.getItem().getId().equals(item.getId()))
+//                                        .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
+//                                        .map(booking -> new BookingMapper().toBookingDto(booking))
+//                                        .min((o1, o2) -> o1.getStart().isBefore(o2.getStart()) ? -1 : 1)
+//                                        .orElse(null)
+//                        )
+//                )
+//                .peek(item -> item.setBookingPrev(
+//                                bookings.stream()
+//                                        .filter(booking -> booking.getItem().getId().equals(item.getId()))
+//                                        .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
+//                                        .map(booking -> new BookingMapper().toBookingDto(booking))
+//                                        .max((o1, o2) -> o1.getStart().isBefore(o2.getStart()) ? -1 : 1)
+//                                        .orElse(null)
+//                        )
+//                )
                 .toList();
 
         return items;
