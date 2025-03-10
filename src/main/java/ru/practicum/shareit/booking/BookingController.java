@@ -39,7 +39,7 @@ public class BookingController {
     public BookingDto getById(@RequestHeader(USER_HEADER) long userId,
                               @PathVariable long bookingId) {
         log.debug("getById id={}", bookingId);
-        return bookingService.get(userId, bookingId);
+        return bookingService.get(bookingId);
     }
 
     @GetMapping()
