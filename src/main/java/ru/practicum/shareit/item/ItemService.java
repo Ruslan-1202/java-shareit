@@ -2,6 +2,9 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.BookingMapper;
+import ru.practicum.shareit.booking.BookingStorage;
 import ru.practicum.shareit.comment.Comment;
 import ru.practicum.shareit.comment.CommentMapper;
 import ru.practicum.shareit.comment.dto.CommentCreateDto;
@@ -14,6 +17,8 @@ import ru.practicum.shareit.item.dto.ItemPatchDto;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserStorage;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static ru.practicum.shareit.item.ItemMapper.toItemDto;
@@ -24,6 +29,7 @@ import static ru.practicum.shareit.item.ItemMapper.toItemFromItemPatchDto;
 public class ItemService {
     private final ItemStorage itemStorage;
     private final UserStorage userStorage;
+    private final BookingStorage bookingStorage;
 
     public ItemDto create(Long userId, ItemDto itemDto) {
         User user = userStorage.get(userId)
@@ -35,7 +41,9 @@ public class ItemService {
 
     public ItemDto get(Long userId, Long itemId) {
         checkUserExists(userId);
-        return ItemMapper.toItemDto(getItem(itemId));
+        ItemDto itemDto = ItemMapper.toItemDto(getItem(itemId));
+        return addFields(List.of(itemDto)).get(0);
+        // return ItemMapper.toItemDto(getItem(itemId));
     }
 
     private void checkUserExists(Long userId) {
@@ -62,6 +70,42 @@ public class ItemService {
                 .toList();
     }
 
+    private List<ItemDto> addFields(List<ItemDto> items) {
+        List<Comment> comments = itemStorage.getComments(items);
+        List<Booking> bookings = bookingStorage.getBokings(items);
+
+        items.stream()
+                .peek(item -> item.setComments(
+                                comments.stream()
+                                        .filter(comment -> comment.getItem().getId() == item.getId())
+                                        .map(a -> new CommentMapper().toCommentRetDto(a))
+                                        .toList()
+                        )
+                )
+                .peek(item -> item.setBookingPrev(
+                                bookings.stream()
+                                        .filter(booking -> booking.getItem().getId() == item.getId())
+                                        .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
+                                        .sorted((o1, o2) -> o1.getStart().isBefore(o2.getStart()) ? -1 : 1)
+                                        .findFirst()
+                                        .map(booking -> new BookingMapper().toBookingDto(booking))
+                                        .orElse(null)
+                        )
+                )
+                .peek(item -> item.setBookingPrev(
+                                bookings.stream()
+                                        .filter(booking -> booking.getItem().getId() == item.getId())
+                                        .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
+                                        .sorted((o1, o2) -> o1.getStart().isBefore(o2.getStart()) ? 1 : -1)
+                                        .findFirst()
+                                        .map(booking -> new BookingMapper().toBookingDto(booking))
+                                        .orElse(null)
+                        )
+                )
+                .toList();
+
+        return items;
+    }
 
     private Item checkUserGetItem(Long userId, Long itemId) {
         User user = getUser(userId);
@@ -88,8 +132,10 @@ public class ItemService {
 
         Comment comment = new CommentMapper().toComment(commentCreateDto, user, item);
 
+        checkBookingApproved(userId, itemId);
+
         return new CommentMapper().toCommentRetDto(itemStorage.saveComment(comment)
-                .orElseThrow(()->new StorageException("Не удалось сохранить комментарий")));
+                .orElseThrow(() -> new StorageException("Не удалось сохранить комментарий")));
     }
 
     public List<CommentRetDto> getCommentsByItem(Long userId, Long itemId) {
@@ -98,4 +144,10 @@ public class ItemService {
                 .map(comment -> new CommentMapper().toCommentRetDto(comment))
                 .toList();
     }
+
+    private void checkBookingApproved(long userId, long itemId) {
+        bookingStorage.getApproved(userId, itemId)
+                .orElseThrow(() -> new StorageException("Пользователь id=" + userId + " не бронировал вещь id=" + itemId));
+    }
+
 }

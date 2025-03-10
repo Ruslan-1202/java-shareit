@@ -1,6 +1,9 @@
 package ru.practicum.shareit.item;
 
 import ru.practicum.shareit.comment.Comment;
+import ru.practicum.shareit.comment.dto.CommentGetDto;
+import ru.practicum.shareit.comment.dto.CommentRetDto;
+import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,4 +22,6 @@ public interface ItemStorage {
     Optional<Comment> saveComment(Comment comment);
 
     List<Comment> getCommentsByItem(Long itemId);
+
+    List<Comment> getComments(List<ItemDto> items);
 }

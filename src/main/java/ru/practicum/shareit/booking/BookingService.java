@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.enumeration.BookingGetAll;
 import ru.practicum.shareit.booking.enumeration.BookingState;
 import ru.practicum.shareit.booking.enumeration.BookingStatus;
 import ru.practicum.shareit.exception.*;
@@ -58,17 +59,30 @@ public class BookingService {
         return new BookingMapper().toBookingDto(checkUserGetBooking(userId, bookingId));
     }
 
-    public List<BookingDto> getAll(long userId, String state) {
+    public List<BookingDto> getAllByBooker(long userId, String state) {
+        BookingState bookingState = getBookingState(state);
+        checkUser(userId);
+        return bookingStorage.getAllByUser(userId, bookingState, BookingGetAll.BOOKER).stream()
+                .map(a->new BookingMapper().toBookingDto(a))
+                .toList();
+    }
+
+    public List<BookingDto> getAllByOwner(long userId, String state) {
+        BookingState bookingState = getBookingState(state);
+        checkUser(userId);
+        return bookingStorage.getAllByUser(userId, bookingState, BookingGetAll.OWNER).stream()
+                .map(a->new BookingMapper().toBookingDto(a))
+                .toList();
+    }
+
+    private BookingState getBookingState(String state) {
         BookingState bookingState;
         try {
             bookingState = BookingState.valueOf(state);
         } catch (Exception e) {
             throw new WrongBookingStateException("Не удалось преобразовать state=" + state);
         }
-
-        return bookingStorage.getAll(userId, bookingState).stream()
-                .map(a->new BookingMapper().toBookingDto(a))
-                .toList();
+        return bookingState;
     }
 
     private Booking getBooking(long bookingId) {

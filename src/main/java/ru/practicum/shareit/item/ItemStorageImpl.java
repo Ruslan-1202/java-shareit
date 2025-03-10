@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.comment.Comment;
 import ru.practicum.shareit.comment.CommentRepository;
+import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -53,5 +54,14 @@ public class ItemStorageImpl implements ItemStorage {
     @Override
     public List<Comment> getCommentsByItem(Long itemId) {
         return commentRepository.findByItem_Id(itemId);
+    }
+
+    @Override
+    public List<Comment> getComments(List<ItemDto> items) {
+        return commentRepository.getComments(
+                items.stream()
+                        .map(a -> a.getId())
+                        .toList()
+        );
     }
 }

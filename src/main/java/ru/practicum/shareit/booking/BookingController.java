@@ -44,9 +44,16 @@ public class BookingController {
     }
 
     @GetMapping()
-    public List<BookingDto> getAll(@RequestHeader(USER_HEADER) long userId,
-                                   @RequestParam(defaultValue = "ALL") String state) {
-        log.debug("getAll userId={}, state={}", userId, state);
-        return bookingService.getAll(userId, state);
+    public List<BookingDto> getAllByBooker(@RequestHeader(USER_HEADER) long userId,
+                                           @RequestParam(defaultValue = "ALL") String state) {
+        log.debug("getAllByUser userId={}, state={}", userId, state);
+        return bookingService.getAllByBooker(userId, state);
+    }
+
+    @GetMapping("/owner")
+    public List<BookingDto> getAllByOwner(@RequestHeader(USER_HEADER) long userId,
+                                          @RequestParam(defaultValue = "ALL") String state) {
+        log.debug("getAllByOwner userId={}, state={}", userId, state);
+        return bookingService.getAllByOwner(userId, state);
     }
 }
