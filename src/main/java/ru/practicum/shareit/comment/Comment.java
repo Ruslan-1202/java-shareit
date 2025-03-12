@@ -21,7 +21,7 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String text;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY) //@EntityGraph(attributePaths = "item") в репе
     private Item item;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")

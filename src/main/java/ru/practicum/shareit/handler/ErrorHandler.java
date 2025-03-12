@@ -55,7 +55,7 @@ public class ErrorHandler {
     public ErrorResponse methodArgumentNotValidException(final MethodArgumentNotValidException e) {
         log.error(e.getMessage(), e);
         return new ErrorResponse(e.getBindingResult().getFieldErrors().stream()
-                .map(error -> (error.getField() + " " + error.getDefaultMessage()))
+                .map(error -> (error.getField() + ": " + error.getDefaultMessage()))
                 .collect(Collectors.joining("; ")));
     }
 
@@ -70,14 +70,14 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse notAvilableException(final NotAvilableException e) {
         log.error(e.getMessage(), e);
-        return new ErrorResponse("Нарушение целостности БД, осторожнее с данными!");
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse wrongDatesException(final WrongDatesException e) {
         log.error(e.getMessage(), e);
-        return new ErrorResponse("Нарушение целостности БД, осторожнее с данными!");
+        return new ErrorResponse("Не правильно заданы даты");
     }
 
     @ExceptionHandler

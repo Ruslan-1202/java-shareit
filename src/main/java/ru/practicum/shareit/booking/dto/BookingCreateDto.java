@@ -1,8 +1,6 @@
 package ru.practicum.shareit.booking.dto;
 
-import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,10 +14,17 @@ public class BookingCreateDto {
     @NotNull
     @Positive
     private Long itemId;
-    @NotNull
-   // @PastOrPresent
+    @NotNull(message = "задайте дату начала")
     private LocalDateTime start;
     @NotNull
-    @FutureOrPresent
+    @FutureOrPresent(message = "дата окончания не может быть в прошлом")
     private LocalDateTime end;
+
+    @AssertTrue(message = "дата начала должна быть меньше конца")
+    public boolean isDatesValid() { //метод обязательно начинается с "is"
+        if (start == null || end == null) {
+            return true;
+        }
+        return start.isBefore(end);
+    }
 }

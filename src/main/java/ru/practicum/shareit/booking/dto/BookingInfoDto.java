@@ -16,5 +16,4 @@ public class BookingInfoDto {
     private Long bookerid;
     private LocalDateTime start;
     private LocalDateTime end;
-//    private BookingStatus status;
 }

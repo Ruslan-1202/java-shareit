@@ -13,7 +13,6 @@ import ru.practicum.shareit.item.ItemStorage;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserStorage;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -24,7 +23,6 @@ public class BookingService {
     private final ItemStorage itemStorage;
 
     public BookingDto create(Long userId, BookingCreateDto bookingCreateDto) {
-        checkDates(bookingCreateDto.getStart(), bookingCreateDto.getEnd());
         Booking booking = bookingStorage.create(
                         new BookingMapper().toBooking(
                                 bookingCreateDto,
@@ -88,12 +86,6 @@ public class BookingService {
     private Booking getBooking(long bookingId) {
         return bookingStorage.get(bookingId)
                 .orElseThrow(() -> new NotFoundException("Заказ с id=" + bookingId + " не найден"));
-    }
-
-    private void checkDates(LocalDateTime start, LocalDateTime end) {
-        if (start.isAfter(end) || start.isEqual(end)) {
-            throw new WrongDatesException("Неправильные даты");
-        }
     }
 
     private User getUser(Long userId) {

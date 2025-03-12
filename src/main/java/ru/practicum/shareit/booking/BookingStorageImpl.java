@@ -18,12 +18,13 @@ public class BookingStorageImpl implements BookingStorage {
     private final BookingRepository bookingRepository;
 
     @Override
+    @Transactional
     public Optional<Booking> create(Booking booking) {
         return Optional.of(bookingRepository.save(booking));
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Optional<Booking> get(long bookingId) {
         return bookingRepository.findById(bookingId);
     }
@@ -37,6 +38,7 @@ public class BookingStorageImpl implements BookingStorage {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Booking> getAllByUser(long userId, BookingState bookingState, BookingGetAll bookingGetAll) {
         List<Booking> bookings;
         LocalDateTime dateTime = LocalDateTime.now();
@@ -76,11 +78,13 @@ public class BookingStorageImpl implements BookingStorage {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Booking> getApproved(long userId, long itemId) {
         return Optional.ofNullable(bookingRepository.getApproved(userId, itemId));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Booking> getBokings(List<ItemDto> items) {
         return bookingRepository.getBokings(items.stream()
                 .map(a -> a.getId())
