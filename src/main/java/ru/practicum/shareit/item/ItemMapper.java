@@ -5,13 +5,18 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemPatchDto;
 import ru.practicum.shareit.user.User;
 
+import java.util.Collections;
+
 public class ItemMapper {
     public static ItemDto toItemDto(Item item) {
         return new ItemDto(
                 item.getId(),
                 item.getName(),
                 item.getDescription(),
-                item.isAvailable()
+                item.isAvailable(),
+                null,
+                null,
+                Collections.emptyList()
         );
     }
 
@@ -36,7 +41,7 @@ public class ItemMapper {
                 oldItem.getDescription(),
                 oldItem.isAvailable(),
                 oldItem.getOwner(),
-                oldItem.getRequest()
+                oldItem.getRequestId()
         );
 
         if (itemPatchDto.getName() != null) {

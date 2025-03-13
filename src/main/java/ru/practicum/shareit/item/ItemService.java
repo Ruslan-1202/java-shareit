@@ -2,6 +2,14 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.BookingMapper;
+import ru.practicum.shareit.booking.BookingStorage;
+import ru.practicum.shareit.booking.dto.BookingInfoDto;
+import ru.practicum.shareit.comment.Comment;
+import ru.practicum.shareit.comment.CommentMapper;
+import ru.practicum.shareit.comment.dto.CommentCreateDto;
+import ru.practicum.shareit.comment.dto.CommentRetDto;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.StorageException;
 import ru.practicum.shareit.exception.WrongUserException;
@@ -10,6 +18,7 @@ import ru.practicum.shareit.item.dto.ItemPatchDto;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserStorage;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static ru.practicum.shareit.item.ItemMapper.toItemDto;
@@ -20,6 +29,7 @@ import static ru.practicum.shareit.item.ItemMapper.toItemFromItemPatchDto;
 public class ItemService {
     private final ItemStorage itemStorage;
     private final UserStorage userStorage;
+    private final BookingStorage bookingStorage;
 
     public ItemDto create(Long userId, ItemDto itemDto) {
         User user = userStorage.get(userId)
@@ -31,7 +41,8 @@ public class ItemService {
 
     public ItemDto get(Long userId, Long itemId) {
         checkUserExists(userId);
-        return ItemMapper.toItemDto(getItem(itemId));
+        ItemDto itemDto = ItemMapper.toItemDto(getItem(itemId));
+        return addBookingAndComments(List.of(itemDto), userId).getFirst();
     }
 
     private void checkUserExists(Long userId) {
@@ -58,6 +69,44 @@ public class ItemService {
                 .toList();
     }
 
+    private List<ItemDto> addBookingAndComments(List<ItemDto> items, long userId) {
+        List<Comment> comments = itemStorage.getComments(items);
+        List<Booking> bookings = bookingStorage.getBokings(items);
+
+        for (ItemDto item : items) {
+            BookingInfoDto bookingDto = bookings.stream()
+                    .filter(booking -> booking.getItem().getOwner().getId() == userId)
+                    .filter(booking -> booking.getItem().getId().equals(item.getId()))
+                    .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
+                    .max((o1, o2) -> o1.getStart().isBefore(o2.getStart()) ? -1 : 1)
+                    .map(booking -> new BookingMapper().toBookingInfoDto(booking))
+                    .orElse(null);
+
+            item.setLastBooking(bookingDto);
+
+            bookingDto = bookings.stream()
+                    .filter(booking -> booking.getItem().getOwner().getId() == userId)
+                    .filter(booking -> booking.getItem().getId().equals(item.getId()))
+                    .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
+                    .min((o1, o2) -> o1.getStart().isBefore(o2.getStart()) ? -1 : 1)
+                    .map(booking -> new BookingMapper().toBookingInfoDto(booking))
+                    .orElse(null);
+
+            item.setNextBooking(bookingDto);
+        }
+
+        items.stream()
+                .peek(item -> item.setComments(
+                                comments.stream()
+                                        .filter(comment -> comment.getItem().getId().equals(item.getId()))
+                                        .map(a -> new CommentMapper().toCommentRetDto(a))
+                                        .toList()
+                        )
+                )
+                .toList();
+
+        return items;
+    }
 
     private Item checkUserGetItem(Long userId, Long itemId) {
         User user = getUser(userId);
@@ -69,14 +118,37 @@ public class ItemService {
     }
 
     private Item getItem(Long itemId) {
-        Item item = itemStorage.get(itemId)
+        return itemStorage.get(itemId)
                 .orElseThrow(() -> new NotFoundException("Вещь id=" + itemId + " не найдена"));
-        return item;
     }
 
     private User getUser(Long userId) {
-        User user = userStorage.get(userId)
+        return userStorage.get(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь id=" + userId + " не найден"));
-        return user;
     }
+
+    public CommentRetDto createComment(Long userId, Long itemId, CommentCreateDto commentCreateDto) {
+        User user = getUser(userId);
+        Item item = getItem(itemId);
+
+        Comment comment = new CommentMapper().toComment(commentCreateDto, user, item);
+
+        checkBookingApproved(userId, itemId);
+
+        return new CommentMapper().toCommentRetDto(itemStorage.saveComment(comment)
+                .orElseThrow(() -> new StorageException("Не удалось сохранить комментарий")));
+    }
+
+    public List<CommentRetDto> getCommentsByItem(Long userId, Long itemId) {
+        checkUserGetItem(userId, itemId);
+        return itemStorage.getCommentsByItem(itemId).stream()
+                .map(comment -> new CommentMapper().toCommentRetDto(comment))
+                .toList();
+    }
+
+    private void checkBookingApproved(long userId, long itemId) {
+        bookingStorage.getApproved(userId, itemId)
+                .orElseThrow(() -> new StorageException("Пользователь id=" + userId + " не бронировал вещь id=" + itemId));
+    }
+
 }

@@ -3,20 +3,23 @@ package ru.practicum.shareit.user;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.user.dto.UserCreateDto;
 import ru.practicum.shareit.user.dto.UserDto;
 
 @RestController
 @RequestMapping(path = "/users")
 @Slf4j
 @RequiredArgsConstructor
+@Validated
 public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public UserDto create(@Valid @RequestBody UserDto userDto) {
-        log.debug("Создание пользователя {}", userDto);
-        return userService.create(userDto);
+    public UserDto create(@Valid @RequestBody UserCreateDto userCreateDto) {
+        log.debug("Создание пользователя {}", userCreateDto);
+        return userService.create(userCreateDto);
     }
 
     @GetMapping("{id}")
