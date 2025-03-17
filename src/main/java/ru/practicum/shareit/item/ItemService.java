@@ -19,9 +19,9 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserStorage;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
-import static ru.practicum.shareit.item.ItemMapper.toItemDto;
 import static ru.practicum.shareit.item.ItemMapper.toItemFromItemPatchDto;
 
 @Service
@@ -59,13 +59,13 @@ public class ItemService {
 
     public List<ItemDto> getByUser(Long userId) {
         return itemStorage.getByUser(userId).stream()
-                .map(item -> toItemDto(item))
+                .map(ItemMapper::toItemDto)
                 .toList();
     }
 
     public List<ItemDto> searchItem(Long userId, String text) {
         return itemStorage.search(userId, text).stream()
-                .map(item -> toItemDto(item))
+                .map(ItemMapper::toItemDto)
                 .toList();
     }
 
@@ -78,7 +78,8 @@ public class ItemService {
                     .filter(booking -> booking.getItem().getOwner().getId() == userId)
                     .filter(booking -> booking.getItem().getId().equals(item.getId()))
                     .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
-                    .max((o1, o2) -> o1.getStart().isBefore(o2.getStart()) ? -1 : 1)
+//                    .max((o1, o2) -> o1.getStart().isBefore(o2.getStart()) ? -1 : 1)
+                    .max(Comparator.comparing(Booking::getStart))
                     .map(booking -> new BookingMapper().toBookingInfoDto(booking))
                     .orElse(null);
 
@@ -88,7 +89,8 @@ public class ItemService {
                     .filter(booking -> booking.getItem().getOwner().getId() == userId)
                     .filter(booking -> booking.getItem().getId().equals(item.getId()))
                     .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
-                    .min((o1, o2) -> o1.getStart().isBefore(o2.getStart()) ? -1 : 1)
+//                    .min((o1, o2) -> o1.getStart().isBefore(o2.getStart()) ? -1 : 1)
+                    .min(Comparator.comparing(Booking::getStart))
                     .map(booking -> new BookingMapper().toBookingInfoDto(booking))
                     .orElse(null);
 
