@@ -87,7 +87,7 @@ public class BookingStorageImpl implements BookingStorage {
     @Transactional(readOnly = true)
     public List<Booking> getBokings(List<ItemDto> items) {
         return bookingRepository.getBokings(items.stream()
-                .map(a -> a.getId())
+                .map(ItemDto::getId)
                 .toList());
     }
 }

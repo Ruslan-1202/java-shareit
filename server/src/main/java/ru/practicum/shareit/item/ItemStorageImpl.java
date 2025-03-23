@@ -60,7 +60,7 @@ public class ItemStorageImpl implements ItemStorage {
     public List<Comment> getComments(List<ItemDto> items) {
         return commentRepository.getComments(
                 items.stream()
-                        .map(a -> a.getId())
+                        .map(ItemDto::getId)
                         .toList()
         );
     }
