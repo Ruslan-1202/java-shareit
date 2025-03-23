@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking.dto;
+package ru.practicum.shareit.comment.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,8 +9,10 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookingCreateDto {
+public class CommentGetDto {
+    private Long id;
+    private String text;
+    private Long authorId;
     private Long itemId;
-    private LocalDateTime start;
-    private LocalDateTime end;
+    private LocalDateTime created;
 }
