@@ -20,7 +20,6 @@ public class ItemController {
 
     @PostMapping
     public ItemDto createItem(@RequestHeader(USER_HEADER) Long userId,
-//                              @Valid
                               @RequestBody ItemDto item) {
         log.debug("Создание вещи: {}", item);
         return itemService.create(userId, item);
@@ -58,7 +57,6 @@ public class ItemController {
     @PostMapping("{itemId}/comment")
     public CommentRetDto createComment(@RequestHeader(USER_HEADER) Long userId,
                                        @PathVariable("itemId") Long itemId,
-//                                       @Valid
                                        @RequestBody CommentCreateDto comment) {
         log.debug("Создание комментария: [{}]", comment);
         return itemService.createComment(userId, itemId, comment);

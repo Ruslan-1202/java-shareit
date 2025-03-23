@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking.enumeration.enumeration;
+package ru.practicum.shareit.booking.enumeration;
 
 public enum BookingState {
     ALL,
