@@ -32,4 +32,18 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             """)
     List<Item> search(@Param(value = "text") String text);
 
+    @Query(
+            nativeQuery = true,
+            value = """
+                    select i.id,
+                           i.name,
+                           i.description,
+                           i.is_available,
+                           i.owner_id,
+                           i.request_id
+                      from items i
+                     where i.request_id = :id
+                    """
+    )
+    List<Item> getByRequest(Long id);
 }

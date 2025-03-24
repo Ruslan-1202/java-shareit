@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestCreateDto;
+import ru.practicum.shareit.request.dto.ItemRequestItemsDto;
 import ru.practicum.shareit.request.dto.ItemRequestRetDto;
 
 import java.util.List;
@@ -37,9 +38,8 @@ public class ItemRequestController {
     }
 
     @GetMapping("{id}")
-    public ItemRequestRetDto getById(@RequestHeader(USER_HEADER) Long userId,
-                                     @PathVariable Long id) {
-        log.debug("getById for id={}, userId={} ", id, userId);
-        return itemRequestService.getById(userId, id);
+    public ItemRequestItemsDto getById(@PathVariable Long id) {
+        log.debug("getById for id={}", id);
+        return itemRequestService.getById(id);
     }
 }

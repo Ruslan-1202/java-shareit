@@ -16,7 +16,8 @@ public class ItemMapper {
                 item.isAvailable(),
                 null,
                 null,
-                Collections.emptyList()
+                Collections.emptyList(),
+                item.getRequestId()
         );
     }
 
@@ -27,6 +28,7 @@ public class ItemMapper {
         item.setDescription(itemDto.getDescription());
         item.setAvailable(itemDto.getAvailable());
         item.setOwner(user);
+        item.setRequestId(itemDto.getRequestId());
 
         return item;
     }

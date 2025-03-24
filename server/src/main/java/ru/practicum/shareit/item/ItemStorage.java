@@ -22,4 +22,6 @@ public interface ItemStorage {
     List<Comment> getCommentsByItem(Long itemId);
 
     List<Comment> getComments(List<ItemDto> items);
+
+    List<Item> getByRequest(Long id);
 }

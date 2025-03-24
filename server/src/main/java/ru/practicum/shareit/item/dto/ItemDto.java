@@ -27,4 +27,6 @@ public class ItemDto {
     private BookingInfoDto nextBooking;
 
     private List<CommentRetDto> comments;
+
+    private Long requestId;
 }

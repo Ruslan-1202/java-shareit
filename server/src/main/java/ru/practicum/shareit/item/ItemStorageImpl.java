@@ -64,4 +64,9 @@ public class ItemStorageImpl implements ItemStorage {
                         .toList()
         );
     }
+
+    @Override
+    public List<Item> getByRequest(Long id) {
+        return itemRepository.getByRequest(id);
+    }
 }
