@@ -1,8 +1,10 @@
 package ru.practicum.shareit.request;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -12,5 +14,13 @@ public class ItemRequestStorage {
 
     public Optional<ItemRequest> save(ItemRequest itemRequest) {
         return Optional.of(requestRepository.save(itemRequest));
+    }
+
+    public List<ItemRequest> getByUser(long userId) {
+        return requestRepository.findItemRequestsByRequestorId(userId);
+    }
+
+    public List<ItemRequest> getAll() {
+        return requestRepository.findAll(Sort.by(Sort.Direction.DESC, "created"));
     }
 }
