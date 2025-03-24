@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemRequestDto {
+public class ItemRequestRetDto {
     private Long id;
     private String description;
     private UserDto requestor;
