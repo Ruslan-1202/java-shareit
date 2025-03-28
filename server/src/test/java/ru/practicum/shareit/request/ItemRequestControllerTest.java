@@ -13,13 +13,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.shareit.request.dto.ItemRequestRetDto;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ItemRequestControllerTest {
@@ -63,5 +63,38 @@ public class ItemRequestControllerTest {
                 .andExpect(jsonPath("$.id", is(dto.getId()), Long.class))
                 .andExpect(jsonPath("$.description", is(dto.getDescription())))
         ;
+    }
+
+    @Test
+    void getItemRequest() throws Exception {
+        when(service.get(any()))
+                .thenReturn(List.of());
+
+        mvc.perform(get(URL)
+                        .header("X-Sharer-User-Id", dto.getId().toString())
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[]"))
+        ;
+
+        verify(service, times(1)).get(any());
+    }
+
+    @Test
+    void getAllItemRequest() throws Exception {
+        when(service.getAll())
+                .thenReturn(List.of());
+
+        mvc.perform(get(URL + "/all")
+                        .header("X-Sharer-User-Id", dto.getId().toString())
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[]"));
+
+        verify(service, times(1)).getAll();
     }
 }

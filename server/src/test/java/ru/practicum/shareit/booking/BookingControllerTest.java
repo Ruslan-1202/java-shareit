@@ -10,7 +10,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.exception.WrongUserException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -80,7 +82,7 @@ public class BookingControllerTest {
 
         when(service.getAllByOwner(userId, state)).thenReturn(Collections.emptyList());
 
-        mvc.perform(get(URL+"/owner")
+        mvc.perform(get(URL + "/owner")
                         .header("X-Sharer-User-Id", userId)
                         .param("state", state))
                 .andExpect(status().isOk())
@@ -96,7 +98,7 @@ public class BookingControllerTest {
 
         when(service.approve(userId, bookingId, true)).thenReturn(dto);
 
-        mvc.perform(patch(URL+"/1")
+        mvc.perform(patch(URL + "/1")
                         .header("X-Sharer-User-Id", userId))
                 .andExpect(status().isOk());
 
@@ -115,5 +117,18 @@ public class BookingControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(dto.getId()), Long.class));
+    }
+
+    @Test
+    void approveWithException() throws Exception {
+        when(service.approve(1L, 1L, true)).thenThrow(WrongUserException.class);
+
+        mvc.perform(patch(URL + "/1")
+                        .header("X-Sharer-User-Id", 1L)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is(500));
     }
 }

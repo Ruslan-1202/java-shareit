@@ -4,7 +4,9 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.BaseTest;
@@ -12,6 +14,7 @@ import ru.practicum.shareit.comment.Comment;
 import ru.practicum.shareit.comment.CommentMapper;
 import ru.practicum.shareit.comment.dto.CommentCreateDto;
 import ru.practicum.shareit.comment.dto.CommentRetDto;
+import ru.practicum.shareit.exception.StorageException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemPatchDto;
 
@@ -46,7 +49,7 @@ class ItemServiceTest extends BaseTest {
         TypedQuery<Item> query = em.createQuery("select a from Item a where a.owner = :user", Item.class);
         query.setParameter("user", user);
 
-        List<ItemDto> dtoByQuery = List.of(ItemMapper.toItemDto(query.getSingleResult()));
+        List<ItemDto> dtoByQuery = query.getResultList().stream().map(ItemMapper::toItemDto).toList();
 
         assertEquals(dtoByService, dtoByQuery);
     }
@@ -55,12 +58,7 @@ class ItemServiceTest extends BaseTest {
     void search() {
         List<ItemDto> dtoByService = service.searchItem(user.getId(), "tem");
 
-        TypedQuery<Item> query = em.createQuery("select i from Item i\n" +
-                "            where i.available = true\n" +
-                "              and (\n" +
-                "                 upper(i.name) like upper(concat('%', :text, '%'))\n" +
-                "                 or upper(i.description) like upper(concat('%', :text, '%'))\n" +
-                "                  )", Item.class);
+        TypedQuery<Item> query = em.createQuery("select i from Item i\n" + "            where i.available = true\n" + "              and (\n" + "                 upper(i.name) like upper(concat('%', :text, '%'))\n" + "                 or upper(i.description) like upper(concat('%', :text, '%'))\n" + "                  )", Item.class);
         query.setParameter("text", "tem");
 
         List<ItemDto> dtoByQuery = List.of(ItemMapper.toItemDto(query.getSingleResult()));
@@ -72,18 +70,10 @@ class ItemServiceTest extends BaseTest {
     void getCommentsByItem() {
         List<CommentRetDto> dtoByService = service.getCommentsByItem(user.getId(), item.getId());
 
-        TypedQuery<Comment> query = em.createQuery("select  c.id,\n" +
-                "                            c.text,\n" +
-                "                            c.author,\n" +
-                "                            c.item,\n" +
-                "                            c.created\n" +
-                "                      from Comment c\n" +
-                "                     where c.item = :id", Comment.class);
+        TypedQuery<Comment> query = em.createQuery("select  c.id,\n" + "                            c.text,\n" + "                            c.author,\n" + "                            c.item,\n" + "                            c.created\n" + "                      from Comment c\n" + "                     where c.item = :id", Comment.class);
         query.setParameter("id", item);
 
-        List<CommentRetDto> dtoByQuery = query.getResultList().stream()
-                .map(comment -> new CommentMapper().toCommentRetDto(comment))
-                .toList();
+        List<CommentRetDto> dtoByQuery = query.getResultList().stream().map(comment -> new CommentMapper().toCommentRetDto(comment)).toList();
 
         assertEquals(dtoByService, dtoByQuery);
     }
@@ -94,12 +84,7 @@ class ItemServiceTest extends BaseTest {
         commentCreateDto.setText("Test comm");
 
         CommentRetDto dtoByService = service.createComment(user.getId(), item.getId(), commentCreateDto);
-        CommentRetDto dtoByQuery = new CommentMapper().toCommentRetDto(new CommentMapper().toComment(
-                        commentCreateDto,
-                        user,
-                        item
-                )
-        );
+        CommentRetDto dtoByQuery = new CommentMapper().toCommentRetDto(new CommentMapper().toComment(commentCreateDto, user, item));
 
         assertEquals(dtoByService.getText(), dtoByQuery.getText());
     }
@@ -112,7 +97,10 @@ class ItemServiceTest extends BaseTest {
 
         ItemDto itemDto = service.change(user.getId(), newItem);
 
+        Item itemMap = ItemMapper.toItemFromItemPatchDto(item, newItem);
+
         assertEquals(newItem.getName(), itemDto.getName());
+        assertEquals(newItem.getName(), itemMap.getName());
     }
 
     @Test
@@ -127,5 +115,19 @@ class ItemServiceTest extends BaseTest {
         itemDto.setId(newItemDto.getId());
 
         assertEquals(itemDto, newItemDto);
+    }
+
+    @Test
+    void storageException() {
+        CommentCreateDto commentCreateDto = new CommentCreateDto();
+        commentCreateDto.setText("Test comm");
+
+        ItemService mockItemService = Mockito.mock(ItemService.class);
+
+        Mockito.when(mockItemService.createComment(Mockito.anyLong(), Mockito.anyLong(), Mockito.any())).thenThrow(new StorageException("Ошибка при доступе к базе"));
+
+        final StorageException exception = Assertions.assertThrows(StorageException.class, () -> mockItemService.createComment(user.getId(), item.getId(), commentCreateDto));
+
+        assertEquals("Ошибка при доступе к базе", exception.getMessage());
     }
 }

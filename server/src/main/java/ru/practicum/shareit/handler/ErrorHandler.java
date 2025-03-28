@@ -75,13 +75,6 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse wrongDatesException(final WrongDatesException e) {
-        log.error(e.getMessage(), e);
-        return new ErrorResponse("Не правильно заданы даты");
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse exception(final Exception e) {
         log.error(e.getMessage(), e);
         return new ErrorResponse(e.getMessage());

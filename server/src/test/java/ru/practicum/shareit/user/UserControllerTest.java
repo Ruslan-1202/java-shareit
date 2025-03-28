@@ -10,6 +10,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.practicum.shareit.exception.ExsistingEmailException;
+import ru.practicum.shareit.exception.StorageException;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.nio.charset.StandardCharsets;
@@ -99,7 +101,7 @@ public class UserControllerTest {
 
     @Test
     void deleteUser() throws Exception {
-       // when(service.delete(any()));
+        // when(service.delete(any()));
 
         mvc.perform(delete("/users/1")
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -109,5 +111,32 @@ public class UserControllerTest {
         ;
 
         verify(service, times(1)).delete(any());
+    }
+
+    @Test
+    void saveWithException() throws Exception {
+        when(service.create(any()))
+                .thenThrow(ExsistingEmailException.class);
+
+        mvc.perform(post("/users")
+                        .content(mapper.writeValueAsString(userDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(409));
+    }
+
+    @Test
+    void saveStorageException() throws Exception {
+
+        when(service.create(any()))
+                .thenThrow(StorageException.class);
+
+        mvc.perform(post("/users")
+                        .content(mapper.writeValueAsString(userDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(500));
     }
 }
