@@ -24,6 +24,7 @@ public class UserServiceTest extends BaseTest {
     private final UserService service;
 
     private static User newUser;
+
     @Test
     @Order(1)
     void getById() {
